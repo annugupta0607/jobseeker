@@ -1,0 +1,71 @@
+{% extends "admin/index.html" %}
+
+{% block breadcrumbs %}
+{% if user.is_superuser %}
+    {{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_superuser %}
+{{ block.super }}
+{% else %}
+<h1>Welcome to JobSeekers Portal</h1>
+
+<button onclick="addFilter()">Add Filter</button>
+<form id="searchForm" action="/admin/jobseeker/applicant">
+    <div>
+        <select id="field0" onchange="changeField(0)">
+            {% for f in fields %}
+            <option value="{{f}}">{{f}}</option>
+            {% endfor %}
+        </select>
+        <select id="filter0" onchange="changeField(0)">
+            <option value="">Equals</option>
+            <option value="__contains">Contains</option>
+            <option value="__gt">More than</option>
+            <option value="__lt">Less than</option>
+        </select>
+        <input id="input0" type="text"/>
+    </div>
+    <input id="formSubmitButton" type="submit" value="Submit">
+</form>
+
+<script>
+    var fields = [];
+    var filter_count = 1;
+    {% for f in fields %}
+        fields.push('{{f}}');
+    {% endfor %}
+    function addFilter() {
+        fi = filter_count.toString()
+        var sel = '<select id="field'+fi+'">';
+        for (i in fields) {
+            sel += '<option value="'+fields[i]+'">'+fields[i]+'</option>';
+        }
+        sel += '</select>';
+        sel += '<select id="filter'+fi+'" onchange="changeField(0)"><option value="">Equals</option><option value="_contains">Contains</option><option value="gt">More than</option><option value="_lt">Less than</option></select>';
+        sel += '<input id="input'+fi+'"><br/>';
+        console.log(sel);
+
+        var div = document.createElement("div");
+        div.innerHTML = sel;
+
+        document.getElementById("searchForm").insertBefore(div, document.getElementById("formSubmitButton"));
+
+        filter_count += 1;
+    }
+    function changeField(i) {
+        document.getElementById("input"+i).name = document.getElementById("field"+i).value + document.getElementById("filter"+i).value;
+    }
+</script>
+{% endif %}
+{% endblock %}
+
+
+{% block sidebar %}
+{% if user.is_superuser %}
+    {{ block.super }}
+{% endif %}
+{% endblock %}
